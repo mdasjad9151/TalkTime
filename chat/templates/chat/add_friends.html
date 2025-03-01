@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Friends</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white h-screen flex flex-col items-center p-6">
+
+    <h1 class="text-2xl font-bold mb-4">Add Friends</h1>
+
+    <div class="w-full max-w-md bg-gray-800 p-4 rounded-lg shadow">
+        <ul>
+            {% for user in users %}
+                <li class="flex justify-between items-center p-2 border-b border-gray-700">
+                    <span>{{ user.username }}</span>
+                    <button class="bg-blue-500 px-4 py-2 rounded add-friend-btn" data-id="{{ user.id }}">
+                        Add
+                    </button>
+                </li>
+            {% empty %}
+                <li class="text-gray-400 p-2">No users available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        document.querySelectorAll(".add-friend-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const userId = this.getAttribute("data-id");
+
+                fetch(`/add_friend/${userId}/`, {
+                    method: "POST",
+                    headers: { "X-CSRFToken": "{{ csrf_token }}"},
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.innerText = "Requested";
+                        this.classList.replace("bg-blue-500", "bg-gray-500");
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
